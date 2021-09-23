@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# pcapsumm-timer
+#		This script is a front-end for running a plugin tap with
+#		tshark.  It is modeled after pcapsummary, except that this
+#		script includes the -start and -end options.
+#
+#		This script was created for the GAWSEED project, part of
+#		the CHASE program.
+#
+#		usage:	pcapsumm-timer <file.pcap>
+#
+#		If a pcap file isn't given, then we'll default to reading
+#		wireshark.pcap.
+#
+#
+# Revision History
+#	1.0	Initial revision.					190220
+#	1.1	Renamed to pcapsumm-timer.				200206
+#
+
+#
+# Version information.
+#
+NAME="pcapsumm-timer"
+VERS="pcapsumm-timer version: 1.1"
+
+#----------------------------------------------------------------------------
+
+DEFPCAP="wireshark.pcap"
+
+#
+# Get the name of the pcap file to read.
+#
+PCAP=$DEFPCAP
+if [ $# -gt 0 ]
+then
+	PCAP=$1
+fi
+
+TAP="pcap-summarizer.lua"
+
+#
+# Make sure the pcap file exists.  We'll let tshark check on accessibility.
+#
+if [ ! -e $PCAP ]
+then
+	echo pcap file \"$PCAP\" does not exist
+	exit 1
+fi
+
+tshark -q -r $PCAP -X lua_script:$TAP -X lua_script1:-save=/tmp/pcap.summary -X lua_script1:-start=1/12/19,20:00 -X lua_script1:-end=1/13/19,2:00
+
+
+exit 0
+

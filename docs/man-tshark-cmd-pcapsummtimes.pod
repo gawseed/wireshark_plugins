@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+#
+# man-tshark-cmd-pcapsummtimes.pod
+#			This is a pod file for the pcapsumm-times script.  It
+#			is a front-end to the pcap-summarizer.lua plugin for
+#			the Tshark command.
+#
+#	usage:
+#		perldoc man-tshark-cmd-pcapsummtimes.pod
+#
+# Revision History
+#	1.0	Initial revision.					200427
+#
+#	Written by Wayne Morrison, 200427.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-tshark-cmd-pcapsummtimes.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<pcapsumm-times> - front-end to the B<pcap-summarizer.lua> plugin for the B<Tshark> command
+
+=head1 SYNOPSIS
+
+  pcapsumm-times [pcap-file]
+
+=head1 DESCRIPTION
+
+B<pcapsumm-times> is a simple front-end to the B<pcap-summarizer.lua> plugin
+for the B<Tshark> command, which is used to gather information about network
+traffic.
+
+This script is modeled after B<pcapsummary>, except that B<pcapsumm-times>
+includes the I<-start>, I<-end>, and I<-save> options.  Its primary intent
+is to demonstrate the use of several of the options for B<pcap-summarizer.lua>.
+
+If a PCAP file isn't given on the command line, then B<pcapsumm-times> will
+default to reading the B<wireshark.pcap> file.
+
+B<pcapsumm-times> assumes it is being run in the same directory as the
+B<pcap-summarizer.lua> plugin file.
+
+B<pcapsumm-times> is hardcoded to run the B<pcap-summarizer.lua> plugin with
+the following options:
+
+	-save=/tmp/pcap.summary
+	-start=1/12/19,20:00
+	-end=1/13/19,2:00
+
+Obviously, to make real use of B<pcapsumm-times> the timestamps for the
+I<start> and I<end> options must be updated. 
+
+=head1 OPTIONS
+
+B<pcapsumm-times> takes no options.
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<pcap-summarizer.lua(1)>,
+B<Tshark(1)>
+
+=cut
+

@@ -1,0 +1,390 @@
+#!/usr/bin/perl
+#
+# pcap-grand-summary
+#		This script summarizes a set of PCAP summary files.
+#		The summary files are assumed to have been created
+#		by the pcap-summarizer.lua plugin tap for tshark. 
+#
+#		This script was created for the GAWSEED project,
+#		part of the CHASE program.
+#
+#	usage:
+#		pcap-grand-summary [-... | -help | -Version] <file1> .. <fileN>
+#
+# Revision History
+#	1.0	Initial revision.					190219
+#	1.1	Renamed to pcap-grand-summary				200206
+#
+#
+
+use strict;
+
+use Getopt::Long qw(:config no_ignore_case_always);
+
+#
+# Version information.
+#
+my $NAME   = "pcap-grand-summary";
+my $VERS   = "$NAME version: 1.1";
+
+############################################################################
+#
+# Options fields.
+#
+my %opts = ();				# Options.
+
+#
+# Command line arguments.
+#
+my @opts = (
+		'verbose',			# Give verbose output.
+		'help',				# Give a help message.
+		'Version',			# Display the program version.
+	   );
+
+my $verbose = 0;				# Verbose flag.
+
+############################################################################
+#
+# Data gathered from each summary file.
+#
+
+my %records = ();			# Count of records for each timestamp.
+my $totalpackets = 0;			# Total number of packets read.
+my %protocnts = ();			# Count of packets for each protocol.
+
+my $uniqsrcaddrs = 0;			# Count of unique source addresses.
+my $uniqdstaddrs = 0;			# Count of unique destination addresses.
+
+my %srcaddrcnts = ();			# Total count of src-address use.
+my %dstaddrcnts = ();			# Total count of dest-address use.
+
+my %srcdports = ();			# Total count of srcaddr/dstport use.
+
+my %convocounts = ();			# Total count of conversations.
+
+my %lowlowcounts = ();			# Low-to-low port packet counts.
+my %highhighcounts = ();		# High-to-high port packet counts.
+
+############################################################################
+
+main();
+exit(0);
+
+#-----------------------------------------------------------------------------
+# Routine:	main()
+#
+sub main
+{
+	$| = 1;
+
+	#
+	# Munch on the options and arguments.
+	#
+	optsandargs();
+
+	foreach my $fn (@ARGV)
+	{
+		summfile($fn);
+	}
+	print("\n");
+
+	grandtotals();
+}
+
+#----------------------------------------------------------------------
+# Routine:	optsandargs()
+#
+# Purpose:	Parse the command line for options and arguments.
+#
+sub optsandargs
+{
+	#
+	# Parse the options.
+	#
+	GetOptions(\%opts,@opts) || usage();
+
+	#
+	# Check for some immediate-action options.
+	#
+	usage()		 if(defined($opts{'help'}));
+	version()	 if(defined($opts{'Version'}));
+
+	$verbose = $opts{'verbose'};
+
+	usage() if(@ARGV == 0);
+
+}
+
+#----------------------------------------------------------------------
+# Routine:	summfile()
+#
+# Purpose:	Summarize a file.
+#
+sub summfile
+{
+	my $fn = shift;				# File to summarize.
+	my @data = ();				# Data from the file.
+
+	#
+	# Get the contents of the datafile.
+	#
+	open(DFN, "< $fn");
+	@data = <DFN>;
+	close(DFN);
+
+	print "reading summary file $fn\n" if($verbose);
+	foreach my $ln (@data)
+	{
+		my @atoms;			# Pieces of the line.
+		my $tstmp;			# Line's timestamp.
+		my $field;			# Line's field name.
+
+		chomp $ln;
+
+		@atoms = split /\|/, $ln;
+		$tstmp = shift @atoms;
+		$field = shift @atoms;
+
+		$records{$tstmp}++;
+
+# print "---> $ln\n";
+
+		if($field eq 'total-packets')
+		{
+			$totalpackets += $atoms[0];
+		}
+		elsif($field eq 'protocnts')
+		{
+			$protocnts{$atoms[0]} += $atoms[1];
+		}
+		elsif($field eq 'unique source addresses')
+		{
+			$uniqsrcaddrs += $atoms[0];
+		}
+		elsif($field eq 'unique destination addresses')
+		{
+			$uniqdstaddrs += $atoms[0];
+		}
+		elsif($field eq 'source-address counts')
+		{
+			$srcaddrcnts{$atoms[0]} += $atoms[1];
+		}
+		elsif($field eq 'destination-address counts')
+		{
+			$dstaddrcnts{$atoms[0]} += $atoms[1];
+		}
+		elsif($field eq 'srcaddr/dport counts')
+		{
+			$srcdports{$atoms[0]}{$atoms[1]} += $atoms[2];
+		}
+		elsif($field eq 'conv packets counts')
+		{
+			$convocounts{$atoms[0]} += $atoms[1];
+		}
+		elsif($field eq 'low-to-low port packet counts')
+		{
+			$lowlowcounts{$atoms[0]} += $atoms[1];
+		}
+		elsif($field eq 'high-to-high port packet counts')
+		{
+			$highhighcounts{$atoms[0]} += $atoms[1];
+		}
+
+	}
+
+}
+
+#----------------------------------------------------------------------
+# Routine:	grandtotals()
+#
+# Purpose:	Display the summary of summaries.
+#
+sub grandtotals
+{
+
+	print "total packets:  $totalpackets\n";
+	print "\n";
+
+	print "protocol counts:\n";
+	foreach my $prot (sort(keys(%protocnts)))
+	{
+		my $pct;				# Percent of packets.
+
+		$pct = (1.0 * $protocnts{$prot} / $totalpackets) * 100;
+		printf("\t%-10s\t$protocnts{$prot}\t%3.2f\n", $prot, $pct);
+	}
+	print "\n";
+
+	$uniqsrcaddrs = int(keys(%srcaddrcnts));
+	print "unique source addresses:  $uniqsrcaddrs\n";
+	$uniqdstaddrs = int(keys(%dstaddrcnts));
+	print "unique destination addresses:  $uniqdstaddrs\n";
+	print "\n";
+
+	print "source-address counts:\n";
+	foreach my $addr (sort(keys(%srcaddrcnts)))
+	{
+		printf("\t%-17s\t%5d\n", $addr, $srcaddrcnts{$addr});
+	}
+	print "\n";
+
+	print "destination-address counts:\n";
+	foreach my $addr (sort(keys(%dstaddrcnts)))
+	{
+		printf("\t%-17s\t%5d\n", $addr, $dstaddrcnts{$addr});
+	}
+	print "\n";
+
+	print "source address/destination port counts:\n";
+	foreach my $addr (sort(keys(%srcdports)))
+	{
+		if(exists($srcdports{$addr}{'no wkprots'}))
+		{
+			printf("\t%-20s\tno well-known protocols\n", $addr);
+		}
+		else
+		{
+			my $sdps = $srcdports{$addr};
+			my %sdps = %$sdps;
+			foreach my $prot (sort(keys(%sdps)))
+			{
+				printf("\t%-20s\t%-8s\t%5d\n", $addr, $prot, $srcdports{$addr}{$prot});
+			}
+		}
+	}
+	print "\n";
+
+	print "packet counts in conversations:\n";
+	foreach my $addr (sort(keys(%convocounts)))
+	{
+		printf("\t%-30s\t%5d\n", $addr, $convocounts{$addr});
+	}
+	print "\n";
+
+	print "low-to-low port packet counts:\n";
+	foreach my $addr (sort(keys(%lowlowcounts)))
+	{
+		printf("\t%-17s\t%5d\n", $addr, $lowlowcounts{$addr});
+	}
+	print "\n";
+
+	print "high-to-high port packet counts:\n";
+	foreach my $addr (sort(keys(%highhighcounts)))
+	{
+		printf("\t%-17s\t%5d\n", $addr, $highhighcounts{$addr});
+	}
+	print "\n";
+
+}
+
+#----------------------------------------------------------------------
+# Routine:	version()
+#
+# Purpose:	Print the version number(s) and exit.
+#
+sub version
+{
+	print STDERR "$VERS\n";
+	exit(0);
+}
+
+#----------------------------------------------------------------------
+# Routine:	usage()
+#
+# Purpose:	Give usage message and exit.
+#
+sub usage
+{
+	print STDERR "usage:  pcap-grand-summary [options] <file1> ... <fileN>\n";
+	print STDERR "\n";
+	print STDERR "\twhere [options] are:\n";
+	print STDERR "\t\t-help\n";
+	print STDERR "\t\t-verbose\n";
+	print STDERR "\t\t-Version\n";
+
+	exit(0);
+}
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<pcap-grand-summary> - summarizes a set of PCAP summary files
+
+=head1 SYNOPSIS
+
+  pcap-grand-summary [options] <file1> ... <fileN>
+
+=head1 DESCRIPTION
+
+B<pcap-grand-summary> summarizes a set of PCAP summary files.  The summary
+files are assumed to have been created by the B<pcap-summarizer.lua> plugin
+tap for B<tshark>.
+
+The summarized data are:
+
+=over 4
+
+=item * count of total packets
+
+=item * count of packets in each protocol counts, including the percentage of
+the protocols in the total packet count
+
+=item * number of unique source addresses
+
+=item * number of unique destination addresses
+
+=item * number of source addresses associated with each address
+
+=item * destination-addresses associated with each address
+
+=item * count of each source address/destination/port tuple
+
+=item * packet counts in each distinct conversations
+
+=item * count of packets in each low port-to-low port conversation
+
+=item * count of packets in each high port-to-high port conversation
+
+=back
+
+See the description of the B<pcap-summarizer.lua> plugin for more information
+about the summary data.
+
+This script was created for the GAWSEED project, part of the CHASE program.
+
+=head1 OPTIONS
+
+B<pcap-grand-summary> takes the following options:
+
+=over 4
+
+=item I<-verbose>
+
+This option gives verbose info.
+
+=item I<-Version>
+
+Display the version information for B<pcap-grand-summary>.
+
+=item I<-help>
+
+Display a help message.
+
+=back
+
+=head1 AUTHOR
+
+Wayne Morrison, tewok@tislabs.com
+
+=head1 SEE ALSO
+
+B<pcap-summarizer.lua(1)>,
+B<tshark(1)>
+
+=cut

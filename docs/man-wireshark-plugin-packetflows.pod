@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+#
+# man-wireshark-plugin-packetflows.pod
+#		This is a pod file for the packet-flows.lua wireshark plugin.
+#
+#	usage:
+#		perldoc man-wireshark-plugin-packetflows.pod
+#
+# Revision History
+#	1.0	Initial revision.					200428
+#
+#	Written by Wayne Morrison, 200428.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-wireshark-plugin-packetflows.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<packet-flows.lua> - Display packet flows in B<Wireshark> 
+
+=head1 DESCRIPTION
+
+B<packet-flows.lua> is a plugin for B<Wireshark>.  It displays in a dialog
+box the packet flows that occur between pairs of hosts.  B<packet-flows.lua>
+registers a menu item in B<Wireshark>'s Tools/GAWSEED menu, and selecting
+this menu item invokes this plugin.
+
+For each packet flow, the dialog box contains the source address, the
+destination address, the port, and the elapsed time from the beginning of the
+packet capture until that particular packet was sent.  Well-known ports are
+translated to names, rather than left as port numbers; for example, "dns" and
+"ntp" will be used when the port are 53 and 123.  The output in the dialog box
+is for a given originator/target pair is clearly separated from other pairs.
+
+This same data is written to a plugin-specific log file, but in a slightly
+less pretty format.  This output includes the packet number, which is also
+how that output is sorted.  The filename is defined in the I<LOGFILE>
+variable.  By default, this is B</tmp/save.packet-flows>, but it may be
+set as desired.
+
+Since B<packet-flows.lua> is loaded as a plugin, it must be specified in a
+I<load> command in a B<Wireshark> configuration file.
+
+The well-known protocols recognized by B<packet-flows.lua> are:
+
+=over 4
+
+=item * FTP
+
+=item * SSH
+
+=item * TELNET
+
+=item * SMTP
+
+=item * TIME
+
+=item * NAME
+
+=item * WHOIS
+
+=item * DNS
+
+=item * TFTP
+
+=item * HTTP
+
+=item * POP2
+
+=item * POP3
+
+=item * SFTP
+
+=item * NTP
+
+=item * IMAP
+
+=item * SNMP
+
+=item * SNMPTRAP
+
+=item * BGP
+
+=item * IMAP3
+
+=item * LDAP
+
+=item * HTTPS
+
+=item * SYSLOG
+
+=item * LDAPS
+
+=item * FTPSDATA
+
+=item * FTPS
+
+=item * TELNETS
+
+=item * IMAPS
+
+=item * POP3S
+
+=item * SSDP
+
+=back
+
+=head1 OPTIONS
+
+B<packet-flows.lua> takes no options.
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<wireshark(1)>
+
+B<gawseed.conf(5)>
+
+=cut
+

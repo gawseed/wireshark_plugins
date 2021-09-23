@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+#
+# man-tshark-plugin-pcapsummarizer.pod
+#
+#		This is a pod file for the pcap-summarizer.lua plugin
+#		for Tshark.
+#
+#	usage:
+#		perldoc man-tshark-plugin-pcapsummarizer.pod
+#
+# Revision History
+#	1.0	Initial revision.					200423
+#
+#	Written by Wayne Morrison, 200423.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-tshark-plugin-pcapsummarizer.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<pcap-summarizer> - B<Tshark> plugin for summarizing network traffic
+
+=head1 SYNOPSIS
+
+  tshark -X lua_script:pcap-summarizer.lua E<lt>optionsE<gt>
+
+=head1 DESCRIPTION
+
+B<pcap-summarizer.lua> is a Lua plugin for B<Tshark>.  It summarizes data
+collected from a network or from a PCAP file.
+
+The following summaries are provided by this script:
+
+=over 4
+
+=item * total count of packets
+
+=item * number of packets seen in a set of well-known protocols
+
+=item * number of unique source addresses seen
+
+=item * number of unique destination addresses seen
+
+=item * number of packets with a particular source address
+
+=item * number of packets with a particular destination address
+
+=item * number of packets sent by a particular source address to a particular destination port
+
+=item * number of packets in a conversation
+
+=item * number of low-to-low port conversations
+
+=item * number of high-to-high port conversations
+
+=item * number of packets in each CIDR address prefix of a specified length
+
+=item * build time-series CSV files of packets in each CIDR address
+prefix These files are named B<time-series-src-E<lt>addrstrE<gt>.csv>
+and B<time-series-dst-E<lt>addrstrE<gt>.csv>.
+
+=back
+
+The well-known protocols recognized by B<pcap-summarizer.lua> are:
+
+=over 4
+
+=item * FTP
+
+=item * SSH
+
+=item * TELNET
+
+=item * SMTP
+
+=item * TIME
+
+=item * NAME
+
+=item * WHOIS
+
+=item * DNS
+
+=item * TFTP
+
+=item * HTTP
+
+=item * POP2
+
+=item * POP3
+
+=item * SFTP
+
+=item * NTP
+
+=item * IMAP
+
+=item * SNMP
+
+=item * SNMPTRAP
+
+=item * BGP
+
+=item * IMAP3
+
+=item * LDAP
+
+=item * HTTPS
+
+=item * SYSLOG
+
+=item * LDAPS
+
+=item * FTPSDATA
+
+=item * FTPS
+
+=item * TELNETS
+
+=item * IMAPS
+
+=item * POP3S
+
+=item * SSDP
+
+=back
+
+IANA provides guidelines for how port numbers should be used.  These are:
+
+=over 4
+
+=item * lowest well-known port -    0
+
+=item * highest well-known port - 1023
+
+=item * lowest registered port - 1024
+
+=item * highest registered port - 49151
+
+=item * lowest dynamic port - 49152
+
+=item * highest dynamic port - 65535
+
+=back
+
+This script was created for the GAWSEED project, part of the CHASE program.
+
+=head1 OPTIONS
+
+B<pcap-summarizer.lua> takes several options.  These options must be
+given in the "-option=value" format, passed to B<Tshark>'s I<-X> option.
+
+For example, running B<pcap-summarizer.lua> with several options would look
+like this:
+
+    tshark -r foo.pcap -X lua_script:pcap-summarizer.lua -X lua_script1:-save=/tmp/pcap.summary -X lua_script1:-cidr=/24 -X lua_script1:-timedir=csvfiles -X lua_script1:-slotlen=600
+
+The options recognized by B<pcap-summarizer.lua> are:
+
+=over 4
+
+=item * B<-cidr=E<lt>prefix-sizeE<gt>>
+
+Specify the length of the IPv4 address prefix.
+
+E.g., -cidr=/24
+
+=item * B<-end=E<lt>end-timestampE<gt>>
+
+Specify the final timestamp to be examined.
+
+E.g., -end=2/14/19,18:00
+
+=item * B<-save=E<lt>output-fileE<gt>>
+
+Provide the name of an output file.
+
+E.g., -save=/tmp/pcap.summary
+
+=item * B<-slotlen=E<lt>secondsE<gt>>
+
+Give the number of seconds in each time slot.
+
+E.g., -slotlen=180
+
+=item * B<-start=E<lt>start-timestampE<gt>>
+
+Specify the first timestamp to be examined.
+
+E.g., -start=2/14/19,8:00
+
+=item * B<-timedir=E<lt>directoryE<gt>>
+
+Set the directory name for the directory to hold the time-series CSV counts.
+The current directory is used if this isn't set.
+
+E.g., -timedir=chrono-dir
+
+=back
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<Tshark(1)>
+
+B<https://wiki.wireshark.org/Lua/Taps>
+
+=cut
+

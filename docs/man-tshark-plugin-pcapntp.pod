@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+#
+# man-tshark-plugin-pcapntp.pod
+#		This is a pod file for the pcap-ntp.lua Tshark plugin.
+#
+#	usage:
+#		perldoc man-tshark-plugin-pcapntp.pod
+#
+# Revision History
+#	1.0	Initial revision.					200424
+#
+#	Written by Wayne Morrison, 200424.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-tshark-plugin-pcapntp.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<pcap-ntp> - B<Tshark> plugin tap for collecting NTP protocol information
+
+=head1 SYNOPSIS
+
+  tshark -X lua_script:pcap-summarizer.lua <options>
+
+=head1 DESCRIPTION
+
+B<pcap-ntp.lua> is a plugin tap for B<Tshark>.  It collects NTP packet
+information.  The NTP packet data recorded are the the packet mode, the
+leap indicator, the stratum, the poll exponent, precision exponent, and
+the reference id.
+
+=head1 OPTIONS
+
+B<pcap-ntp> takes the following options:
+
+=over 4
+
+=item * I<-plog=E<lt>protocolE<gt>>
+
+Logs data from the specified protocols.  The protocol must be one of
+"ether", "ip", "tcp", "udp", or "ntp".
+
+=item * I<-save=E<lt>logfileE<gt>>
+
+Specifies a file to which B<pcap-ntp.lua> output will be written.
+
+=back
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<Tshark(1)>
+
+=cut
+

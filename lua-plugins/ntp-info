@@ -1,0 +1,56 @@
+#!/bin/bash
+#
+# ntp-info	This script is a front-end for running a plugin tap with tshark.
+#		The particular plugin is used to parse NTP traffic.
+#
+#		usage:	ntp-info <file.pcap>
+#
+#		If a pcap file isn't given, then we'll default to reading
+#		ntp.pcapng.
+#
+#		This script was created for the GAWSEED project, part of
+#		the CHASE program.
+#
+#
+# Revision History
+#	1.0	Initial revision.					190514
+#	1.1	Renamed to ntp-info.					200206
+#
+
+#
+# Version information.
+#
+NAME="ntp-info"
+VERS="ntp-info version: 1.1"
+
+#----------------------------------------------------------------------------
+
+DEFPCAP="ntp.pcapng"
+
+#
+# Get the name of the pcap file to read.
+#
+PCAP=$DEFPCAP
+if [ $# -gt 0 ]
+then
+	PCAP=$1
+fi
+
+TAP="pcap-ntp.lua"
+
+#
+# Make sure the pcap file exists.  We'll let tshark check on accessibility.
+#
+if [ ! -e $PCAP ]
+then
+	echo pcap file \"$PCAP\" does not exist
+	exit 1
+fi
+
+tshark -q -r $PCAP -X lua_script:$TAP -X lua_script1:-plog=ntp -X lua_script1:-ntpflows
+
+
+# tshark -q -r $PCAP -X lua_script:$TAP -X lua_script1:-save=/tmp/pcap.summary -X lua_script1:-cidr=/24 -X lua_script1:-timedir=csvfiles -X lua_script1:-slotlen=600
+
+exit 0
+

@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+#
+# man-tshark-plugin-pcapdns.pod
+#		This is a pod file for the pcap-dns Tshark plugin.
+#
+#	usage:
+#		perldoc man-tshark-plugin-pcapdns.pod
+#
+# Revision History
+#	1.0	Initial revision.					200424
+#
+#	Written by Wayne Morrison, 200424.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-tshark-plugin-pcapdns.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<pcap-dns> - B<Tshark> plugin tap for collecting DNS protocol information
+
+=head1 SYNOPSIS
+
+  tshark -X lua_script:pcap-summarizer.lua <options>
+
+=head1 DESCRIPTION
+
+B<pcap-dns.lua> is a plugin tap for B<Tshark>.  It collects information from
+DNS packets.  Two types of information are recorded -- one-way data flows and
+name-element information.
+
+Information about DNS data flows consists of the source address, the
+destination address, the destination port, and the relative time of the
+packet in the data stream.  Different data are recorded for the
+source/destination pair than the destination/source pair.
+
+The DNS name elements data recorded are the queried hostname, the number
+of elements in that hostname, the query type, and the query class.
+
+Caveat:  This plugin was mid-development when project needs forced a
+redirection of effort.  There is a lot of intermediate informational
+output that is displayed along with the final report. 
+
+=head1 OPTIONS
+
+B<pcap-dns> takes the following options:
+
+=over 4
+
+=item * I<-dnsflows>
+
+Turns on recording of DNS flows.                       
+
+=item * I<-nameelts>
+
+Turns on recording of name elements. 
+
+=item * I<-plog=E<lt>protocolE<gt>>
+
+Logs data from the specified protocols.  The protocol must be one of
+"ether", "ip", "tcp", "udp", or "dns".
+
+=item * I<-save=E<lt>logfileE<gt>>
+
+Specifies a file to which B<pcap-dns.lua> output will be written.
+
+=back
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<Tshark(1)>
+
+=cut
+

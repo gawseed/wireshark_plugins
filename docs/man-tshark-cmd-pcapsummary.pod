@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+#
+# man-tshark-cmd-pcapsummary.pod
+#			This is a pod file for the pcapsummary script.  It
+#			is a front-end to the pcap-summarizer.lua plugin for
+#			the Tshark command.
+#
+#	usage:
+#		perldoc man-tshark-cmd-pcapsummary.pod
+#
+# Revision History
+#	1.0	Initial revision.					200427
+#
+#	Written by Wayne Morrison, 200427.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-tshark-cmd-pcapsummary.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<pcapsummary> - front-end to the B<pcap-summarizer.lua> plugin for the B<Tshark> command
+
+=head1 SYNOPSIS
+
+  pcapsummary [pcap-file]
+
+=head1 DESCRIPTION
+
+B<pcapsummary> is a simple front-end to the B<pcap-summarizer.lua> plugin
+for the B<Tshark> command, which is used to gather information about network
+traffic.
+
+If a PCAP file isn't given on the command line, then B<pcapsummary> will
+default to reading the B<wireshark.pcap> file.
+
+B<pcapsummary> assumes it is being run in the same directory as the
+B<pcap-summarizer.lua> plugin file.
+
+B<pcapsummary> is hardcoded to run the B<pcap-summarizer.lua> plugin with
+the following option:
+
+    -save=/tmp/pcap.summary
+
+=head1 OPTIONS
+
+B<pcapsummary> takes no options.
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<pcap-summarizer.lua(1)>,
+B<Tshark(1)>
+
+=cut
+

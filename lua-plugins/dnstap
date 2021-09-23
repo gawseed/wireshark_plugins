@@ -1,0 +1,55 @@
+#!/bin/bash
+#
+# dnstap	This script is a front-end for running a plugin tap with tshark.
+#		The particular plugin is used to parse DNS traffic.
+#
+#		usage:	dnstap <file.pcap>
+#
+#		If a pcap file isn't given, then we'll default to reading
+#		dns-longnames.pcapng.
+#
+#		This script was created for the GAWSEED project, part of
+#		the CHASE program.
+#
+#
+# Revision History
+#	1.0	Initial revision.					190304
+#
+
+#
+# Version information.
+#
+NAME="dnstap"
+VERS="dnstap version: 1.0"
+
+#----------------------------------------------------------------------------
+
+DEFPCAP="dns-longnames.pcapng"
+
+#
+# Get the name of the pcap file to read.
+#
+PCAP=$DEFPCAP
+if [ $# -gt 0 ]
+then
+	PCAP=$1
+fi
+
+TAP="pcap-dns.lua"
+
+#
+# Make sure the pcap file exists.  We'll let tshark check on accessibility.
+#
+if [ ! -e $PCAP ]
+then
+	echo pcap file \"$PCAP\" does not exist
+	exit 1
+fi
+
+tshark -q -r $PCAP -X lua_script:$TAP -X lua_script1:-plog=dns -X lua_script1:-plog=ip -X lua_script1:-nameelts -X lua_script1:-dnsflows
+
+
+# tshark -q -r $PCAP -X lua_script:$TAP -X lua_script1:-save=/tmp/pcap.summary -X lua_script1:-cidr=/24 -X lua_script1:-timedir=csvfiles -X lua_script1:-slotlen=600
+
+exit 0
+

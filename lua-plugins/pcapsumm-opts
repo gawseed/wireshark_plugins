@@ -1,0 +1,57 @@
+#!/bin/bash
+#
+# pcapsumm-opts
+#		This script is a front-end for running a plugin tap with
+#		tshark.  It is modeled after pcapsummary, except that this
+#		script includes the -cidr and -timedir options.
+#
+#		This script was created for the GAWSEED project, part of
+#		the CHASE program.
+#
+#		usage:	pcapsumm-opts <file.pcap>
+#
+#		If a pcap file isn't given, then we'll default to reading
+#		wireshark.pcap.
+#
+#
+# Revision History
+#	1.0	Initial revision.					190223
+#	1.1	Added use of the -timedir and -slotlen options.		190225
+#	1.2	Renamed to pcapsumm-opts.				200206
+#
+
+#
+# Version information.
+#
+NAME="pcapsumm-opts"
+VERS="pcapsumm-opts version: 1.2"
+
+#----------------------------------------------------------------------------
+
+DEFPCAP="wireshark.pcap"
+
+#
+# Get the name of the pcap file to read.
+#
+PCAP=$DEFPCAP
+if [ $# -gt 0 ]
+then
+	PCAP=$1
+fi
+
+TAP="pcap-summarizer.lua"
+
+#
+# Make sure the pcap file exists.  We'll let tshark check on accessibility.
+#
+if [ ! -e $PCAP ]
+then
+	echo pcap file \"$PCAP\" does not exist
+	exit 1
+fi
+
+tshark -q -r $PCAP -X lua_script:$TAP -X lua_script1:-save=/tmp/pcap.summary -X lua_script1:-cidr=/24 -X lua_script1:-timedir=csvfiles -X lua_script1:-slotlen=600
+
+
+exit 0
+

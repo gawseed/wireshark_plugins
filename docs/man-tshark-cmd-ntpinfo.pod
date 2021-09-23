@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+#
+# man-tshark-cmd-ntpinfo.pod
+#			This is a pod file for the ntp-info script.  It is a
+#			front-end to the pcap-ntp.lua plugin for the Tshark
+#			command.
+#
+#	usage:
+#		perldoc man-tshark-cmd-ntpinfo.pod
+#
+# Revision History
+#	1.0	Initial revision.					200427
+#
+#	Written by Wayne Morrison, 200427.
+#
+
+use strict;
+
+#
+# Version information.
+#
+my $NAME   = "man-tshark-cmd-ntpinfo.pod";
+my $VERS   = "$NAME version: 1.0";
+
+1;
+
+##############################################################################
+
+=pod
+
+=head1 NAME
+
+B<ntp-info> - front-end to the B<pcap-ntp.lua> plugin for the B<Tshark> command
+
+=head1 SYNOPSIS
+
+  ntp-info [pcap-file]
+
+=head1 DESCRIPTION
+
+B<ntp-info> is a simple front-end to the B<pcap-ntp.lua> plugin for the
+B<Tshark> command, which is used to parse NTP traffic.
+
+If a PCAP file isn't given on the command line, then B<ntp-info> will default
+to reading the B<ntp.pcapng> file.
+
+B<ntp-info> assumes it is being run in the same directory as the
+B<pcap-ntp.lua> plugin file.
+
+B<ntp-info> is hardcoded to run the B<pcap-ntp.lua> plugin with the following
+options:
+
+    -plog=ntp
+    -ntpflows
+
+=head1 OPTIONS
+
+B<ntp-info> takes no options.
+
+=head1 AUTHOR
+
+Wayne Morrison, Wayne.Morrison@parsons.com
+
+=head1 SEE ALSO
+
+B<pcap-ntp.lua(1)>,
+B<Tshark(1)>
+
+=cut
+
